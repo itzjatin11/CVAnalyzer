@@ -1,0 +1,38 @@
+﻿@model Dictionary<string, List<CVAnalyzer.Models.Candidate>>
+
+@{
+    ViewData["Title"] = "Candidate Skill Clusters";
+}
+
+<h2 class="mb-4">Grouped Candidates by Skill Categories</h2>
+
+@foreach (var group in Model)
+{
+    <div class="mb-5">
+        <h4 class="text-primary">
+            @group.Key (@group.Value.Select(c => c.StudentName).Distinct().Count()) candidates
+        </h4>
+
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th style="width: 10%;">Student ID</th>
+                    <th style="width: 20%;">Name</th>
+                    <th style="width: 40%;">Skills</th>
+                    <th style="width: 30%;">Experience</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in group.Value.DistinctBy(c => c.StudentName))
+                {
+                    <tr>
+                        <td>@c.StudentId</td>
+                        <td>@c.StudentName</td>
+                        <td style="white-space: normal; word-wrap: break-word;">@c.Skills</td>
+                        <td style="white-space: normal; word-wrap: break-word;">@c.WorkExperience</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

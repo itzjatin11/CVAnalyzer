@@ -1,0 +1,87 @@
+﻿@model List<CVAnalyzer.Models.Candidate>
+
+@{
+    ViewData["Title"] = "Uploaded Candidates";
+}
+
+<h2>Uploaded Candidates</h2>
+
+<form method="get" asp-action="ViewCandidates" asp-controller="Candidates" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Filter By</label>
+        <select name="filterBy" class="form-select" id="filterBy">
+            <option value="">-- Select --</option>
+            <option value="today" selected="@(ViewBag.FilterBy == "today" ? "selected" : null)">Today</option>
+            <option value="yesterday" selected="@(ViewBag.FilterBy == "yesterday" ? "selected" : null)">Yesterday</option>
+            <option value="custom" selected="@(ViewBag.FilterBy == "custom" ? "selected" : null)">Custom Date</option>
+
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <label class="form-label">Select Date</label>
+        <input type="date" name="date" class="form-control" id="dateInput"
+               value="@ViewBag.SelectedDate"
+               @(string.IsNullOrEmpty(ViewBag.FilterBy) || ViewBag.FilterBy != "custom" ? "disabled" : "") />
+    </div>
+
+    
+    <div class="col-md-3 align-self-end">
+        <button type="submit" class="btn btn-primary">Apply Filter</button>
+        <a href="@Url.Action("ExportToExcel", "Candidates", new { filterBy = ViewBag.FilterBy, date = ViewBag.SelectedDate })"
+           class="btn btn-success ms-2">Export to Excel</a>
+    </div>
+
+</form>
+
+<p><strong>Total Filtered Candidates:</strong> @ViewBag.Total</p>
+<p><strong>Server Time (UTC):</strong> @DateTime.UtcNow</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Skills</th>
+            <th>Experience</th>
+            <th>Category</th>
+            <th>Created At (UTC)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="text-center">No candidates found for the selected filter.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var c in Model)
+            {
+                <tr>
+                    <td>@c.StudentId</td>
+                    <td>@c.StudentName</td>
+                    <td>@c.Skills</td>
+                    <td>@c.WorkExperience</td>
+                    <td>@c.Category</td>
+                    <td>@c.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const filterBy = document.getElementById("filterBy");
+        const dateInput = document.getElementById("dateInput");
+
+        function toggleDateInput() {
+            dateInput.disabled = (filterBy.value !== "custom");
+        }
+
+        filterBy.addEventListener("change", toggleDateInput);
+        toggleDateInput(); // initialize on load
+    });
+</script>

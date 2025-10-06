@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Upload CVs";
+}
+
+<!-- Gradient background section -->
+<div class="py-5" style="background: linear-gradient(to right, #e3f2fd, #f1f8e9); min-height: 100vh;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5">
+                        <h2 class="card-title text-center mb-4 fw-bold text-primary">📄 Upload Candidate CVs</h2>
+                        <p class="text-center text-muted">Accepted formats: <strong>PDF, DOCX</strong> • Max file size: <strong>10MB</strong></p>
+
+                        <form asp-controller="CV" asp-action="Upload" method="post" enctype="multipart/form-data">
+                            <div class="mb-4">
+                                <label for="files" class="form-label fw-semibold">Choose or Drag CV Files</label>
+                                <div class="border rounded-3 p-4 text-center bg-light drag-drop-area">
+                                    <input type="file" class="form-control visually-hidden" id="files" name="files" multiple required onchange="updateFileList()" />
+                                    <label for="files" class="btn btn-outline-primary">Browse Files</label>
+                                    <p class="mt-2 text-muted" id="fileListText">No files selected.</p>
+                                </div>
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                                    <i class="bi bi-cloud-upload"></i> Upload CVs
+                                </button>
+                            </div>
+                        </form>
+
+                        @if (ViewBag.Message != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show mt-4" role="alert">
+                                @ViewBag.Message
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateFileList() {
+            const input = document.getElementById('files');
+            const listText = document.getElementById('fileListText');
+            if (input.files.length > 0) {
+                let names = Array.from(input.files).map(f => f.name).join(', ');
+                listText.textContent = `Selected: ${names}`;
+            } else {
+                listText.textContent = "No files selected.";
+            }
+        }
+    </script>
+}

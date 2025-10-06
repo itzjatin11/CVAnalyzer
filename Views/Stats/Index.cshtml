@@ -1,0 +1,192 @@
+﻿@model CVAnalyzer.Models.StatsViewModel
+
+@{
+    ViewData["Title"] = "CV Statistics Dashboard";
+    var topSkills = Model.SkillDistribution?.OrderByDescending(kv => kv.Value).Take(5).ToList() ?? new List<KeyValuePair<string, int>>();
+    var allSkills = Model.SkillDistribution ?? new Dictionary<string, int>();
+    var labels = topSkills.Select(kv => kv.Key).ToList();
+    var data = topSkills.Select(kv => kv.Value).ToList();
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container my-5">
+    <h2 class="mb-4 text-center text-primary">CV Statistics Dashboard</h2>
+
+    <!-- Summary Cards Row -->
+    <div class="row text-center mb-4 g-3">
+        <!-- Total CVs -->
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total CVs</h5>
+                    <p class="display-6 text-info fw-bold mb-0">@Model.TotalCVsUploaded</p>
+                </div>
+            </div>
+        </div>
+        <!-- Unique Candidates -->
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Unique Candidates</h5>
+                    <p class="display-6 text-success fw-bold mb-0">@Model.UniqueCandidates</p>
+                </div>
+            </div>
+        </div>
+        <!-- Top Skill -->
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Top Skill</h5>
+                    <div class="px-3 py-2 rounded fw-bold text-wrap text-center"
+                         style="font-size: 1.5rem; color: #fab005; background: #fffbe6; min-width: 120px;">
+                        @Model.MostCommonSkill
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Processed Today -->
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Processed Today</h5>
+                    <p class="display-6 text-danger fw-bold mb-0">@Model.CVsProcessedToday</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (topSkills.Any())
+    {
+        <!-- Pie Chart -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h4 class="card-title text-center mb-4">Top Skills Distribution</h4>
+                <div class="d-flex justify-content-center">
+                    <canvas id="skillChart" style="max-width: 250px; max-height: 250px;"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Skill Badges/Chips -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="mb-3">Top Skills</h5>
+                <div class="d-flex flex-wrap">
+                    @foreach (var skill in topSkills)
+                    {
+                        <span class="badge bg-primary me-2 mb-2 p-2 text-truncate"
+                              style="max-width: 150px; font-size: 1rem;" title="@skill.Key">
+                            @skill.Key
+                            <span class="badge bg-light text-dark ms-1">@skill.Value</span>
+                        </span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Collapsible Full Skill Table -->
+        <div class="text-center mb-3">
+            <button class="btn btn-outline-secondary" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#fullSkillTable"
+                    aria-expanded="false" aria-controls="fullSkillTable" id="toggleButton">
+                View Full Skill List
+            </button>
+        </div>
+
+        <div class="collapse" id="fullSkillTable">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5>All Skills</h5>
+                    <table class="table table-bordered table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Skill</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var skill in allSkills.OrderByDescending(k => k.Value))
+                            {
+                                <tr>
+                                    <td>@skill.Key</td>
+                                    <td>@skill.Value</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart Script -->
+        <script>
+            const ctx = document.getElementById('skillChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(labels)),
+                    datasets: [{
+                        data: @Html.Raw(Json.Serialize(data)),
+                        backgroundColor: [
+                            '#4e73df', '#1cc88a', '#36b9cc', '#fab005', '#e74a3b'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        </script>
+
+        <!-- Toggle Button Label Script -->
+        <script>
+            const toggleBtn = document.getElementById('toggleButton');
+            const collapseDiv = document.getElementById('fullSkillTable');
+
+            collapseDiv.addEventListener('shown.bs.collapse', () => {
+                toggleBtn.innerText = "Hide Full Skill List";
+            });
+
+            collapseDiv.addEventListener('hidden.bs.collapse', () => {
+                toggleBtn.innerText = "View Full Skill List";
+            });
+        </script>
+    }
+    else
+    {
+        <div class="alert alert-warning text-center" role="alert">
+            No skill data available.
+        </div>
+    }
+</div>
+
+<!-- Load Bootstrap JS (required for collapse) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Collapse Toggle Button Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById('toggleButton');
+        const collapseDiv = document.getElementById('fullSkillTable');
+
+        collapseDiv.addEventListener('shown.bs.collapse', () => {
+            toggleBtn.innerText = "Hide Full Skill List";
+        });
+
+        collapseDiv.addEventListener('hidden.bs.collapse', () => {
+            toggleBtn.innerText = "View Full Skill List";
+        });
+    });
+</script>
+

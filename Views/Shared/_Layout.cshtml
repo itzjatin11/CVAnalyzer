@@ -1,0 +1,91 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CVAnalyzer</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CVAnalyzer.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-light bg-light border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">CVAnalyzer</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    @{
+                        var userRole = HttpContextAccessor.HttpContext.Session.GetString("Role");
+                        var isAdmin = userRole == "Admin";
+                    }
+                    <ul class="navbar-nav me-auto mb-2 mb-sm-0">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">🏠 Dashboard</a>
+                        </li>
+                        @* <li class="nav-item"> *@
+                        @*     <a class="nav-link" asp-area="" asp-controller="CV" asp-action="Upload">📤 Upload CVs</a> *@
+                        @* </li> *@
+                        @* <li class="nav-item"> *@
+                        @*     <a class="nav-link" asp-area="" asp-controller="CV" asp-action="ViewCandidates">📄 View Candidates</a> *@
+                        @* </li> *@
+                        @* <li class="nav-item"> *@
+                        @*     <a class="nav-link" asp-area="" asp-controller="CV" asp-action="SkillClusters">🧠 Skill Clusters</a> *@
+                        @* </li> *@
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Stats" asp-action="Index">📊 Stats</a>
+                        </li>
+
+
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="Index">👤 Manage Users</a>
+                            </li>
+                        }
+                    </ul>
+
+                    @if (HttpContextAccessor.HttpContext.Session.GetString("Username") != null)
+                    {
+                        <div class="d-flex align-items-center">
+                            <span class="me-2 text-dark fw-semibold">
+                                👤 @HttpContextAccessor.HttpContext.Session.GetString("Username")
+                            </span>
+                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-outline-secondary btn-sm">Logout</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a class="btn btn-outline-primary btn-sm" asp-controller="Account" asp-action="Login">Login</a>
+                    }
+
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted mt-4">
+        <div class="container text-center">
+            &copy; 2025 - CVAnalyzer | Developed for AIS Student Projects
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

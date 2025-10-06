@@ -1,0 +1,33 @@
+﻿@model CvUploadViewModel
+
+@{
+    ViewData["Title"] = "Upload Single CV";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">⬆ Upload Single CV</h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="Single" method="post" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label asp-for="CvFile" class="form-label">Choose CV File (.PDF or .DOCX)</label>
+            <input asp-for="CvFile" class="form-control" accept=".pdf,.docx" />
+            <span asp-validation-for="CvFile" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Upload CV</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
